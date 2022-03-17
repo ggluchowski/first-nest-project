@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseUUIDPipe,
   Post,
   Put,
 } from '@nestjs/common';
@@ -34,7 +35,9 @@ export class ProductsController {
   }
 
   @Get(':id')
-  getProductById(@Param('id') _id_: string): ExternalProductDto {
+  getProductById(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) _id_: string,
+  ): ExternalProductDto {
     return this.mapProductToExternal(
       this.productRepository.getProductById(_id_),
     );
@@ -50,13 +53,15 @@ export class ProductsController {
   }
 
   @Delete(':id')
-  deleteProducts(@Param('id') _id_: string): void {
+  deleteProducts(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) _id_: string,
+  ): void {
     return this.productRepository.deleteProduct(_id_);
   }
 
   @Put(':id')
   updateProducts(
-    @Param('id') _id_: string,
+    @Param('id', new ParseUUIDPipe({ version: '4' })) _id_: string,
     @Body() _updateProduct_: UpdateProductDto,
   ): ExternalProductDto {
     const productToUpdate = this.productRepository.updateProduct(

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './interfaces/product.interface';
-import { nanoid } from 'nanoid';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class ProductsDataService {
@@ -18,7 +18,7 @@ export class ProductsDataService {
       createdAt: undefined,
       updatedAt: undefined,
     };
-    product.id = nanoid(6);
+    product.id = uuidv4();
     product.name = newProduct.name;
     product.price = newProduct.price;
     product.count = newProduct.count;

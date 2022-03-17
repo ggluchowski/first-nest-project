@@ -4,8 +4,10 @@ import {
   Delete,
   Get,
   Param,
+  ParseUUIDPipe,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { dateToArray } from 'src/shared/helpers/date.helper';
 import { UsersService } from './users.service';
@@ -13,10 +15,15 @@ import { User } from '../users/interfaces/user.interface';
 import { ExternalUserDto } from './dto/external-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UserValidatorService } from './user-validator.service';
+import { RoleGuard } from 'src/shared/guards/role.guard';
 
 @Controller('users')
 export class UsersController {
-  constructor(private userRepository: UsersService) {}
+  constructor(
+    private userRepository: UsersService,
+    private emailValidation: UserValidatorService,
+  ) {}
 
   mapUserToExternal(user: User): ExternalUserDto {
     return {
@@ -25,13 +32,17 @@ export class UsersController {
     };
   }
 
+  @UseGuards(RoleGuard)
   @Post()
   addUser(@Body() _user_: CreateUserDto): ExternalUserDto {
+    this.emailValidation.validateUniqueEmail(_user_.email);
     return this.mapUserToExternal(this.userRepository.addUser(_user_));
   }
 
   @Get(':id')
-  getUserById(@Param('id') _id_: string): ExternalUserDto {
+  getUserById(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) _id_: string,
+  ): ExternalUserDto {
     return this.mapUserToExternal(this.userRepository.getUserById(_id_));
   }
 
@@ -43,13 +54,15 @@ export class UsersController {
   }
 
   @Delete(':id')
-  deleteUser(@Param('id') _id_: string): void {
+  deleteUser(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) _id_: string,
+  ): void {
     return this.userRepository.deleteUser(_id_);
   }
 
   @Put(':id')
   updateUser(
-    @Param('id') _id_: string,
+    @Param('id', new ParseUUIDPipe({ version: '4' })) _id_: string,
     @Body() _updateUser_: UpdateUserDto,
   ): ExternalUserDto {
     const userToUpdate = this.userRepository.updateUser(_id_, _updateUser_);

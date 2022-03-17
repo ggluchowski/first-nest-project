@@ -1,14 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Roles } from './enums/roles.enum';
+import { Roles } from '../shared/enums/roles.enum';
 import { User } from './interfaces/user.interface';
-import { nanoid } from 'nanoid';
-import { arrayToDate } from 'src/shared/helpers/date.helper';
+import { v4 as uuidv4 } from 'uuid';
+import { UserRequireUniqueEmailException } from './exception/user-require-unique-email-exception';
 
 @Injectable()
 export class UsersService {
   private users: Array<User> = [];
+
+  getUser(email: string): void {
+    const ifEmail = this.users.find((i) => i.email === email);
+    if (ifEmail) {
+      throw new UserRequireUniqueEmailException();
+    }
+  }
 
   addUser(newUser: CreateUserDto): User {
     const user: User = {
@@ -20,11 +27,11 @@ export class UsersService {
       address: [],
       position: Roles.CUSTOMER,
     };
-    user.id = nanoid(6);
+    user.id = uuidv4();
     user.firstName = newUser.firstName;
     user.lastName = newUser.lastName;
     user.email = newUser.email;
-    user.dateOfBirth = arrayToDate(newUser.dateOfBirth);
+    user.dateOfBirth = newUser.dateOfBirth;
     user.address = newUser.address;
     user.position = newUser.position;
     this.users.push(user);
