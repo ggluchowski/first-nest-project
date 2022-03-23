@@ -33,6 +33,8 @@ export class CreateUserDto {
 
 export class CreateUserAddressDto {
   @IsNotEmpty()
+  id: string;
+  @IsNotEmpty()
   country: string;
   @IsNotEmpty()
   city: string;
@@ -43,4 +45,5 @@ export class CreateUserAddressDto {
   buildingNumber: number;
   @IsNumber()
   flatNumber?: number;
+  user: CreateUserDto;
 }

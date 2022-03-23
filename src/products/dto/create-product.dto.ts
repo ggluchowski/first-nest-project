@@ -1,12 +1,5 @@
-import {
-  IsArray,
-  IsEnum,
-  IsNumber,
-  MaxLength,
-  Min,
-  MinLength,
-} from 'class-validator';
-import { Tags } from '../enums/tags.enum';
+import { IsArray, IsNumber, MaxLength, Min, MinLength } from 'class-validator';
+import { Tag } from '../db/tag.entity';
 
 export class CreateProductDto {
   @MinLength(0)
@@ -22,8 +15,5 @@ export class CreateProductDto {
   count: number;
 
   @IsArray()
-  @IsEnum(Tags, {
-    each: true,
-  })
-  tags: Array<Tags>;
+  tags: string[];
 }
