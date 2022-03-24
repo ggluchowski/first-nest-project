@@ -8,12 +8,14 @@ import { UserAddressRepository } from './db/userAddress.repository';
 import { UserAddress } from './db/userAddress.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { UserRequireUniqueEmailException } from './exception/user-require-unique-email-exception';
+// import Connection from 'mysql2/typings/mysql/lib/Connection';
+// import { EntityManager } from 'typeorm';
 
 @Injectable()
 export class UsersService {
   constructor(
     private userRepository: UserRepository,
-    private userAddressRepository: UserAddressRepository,
+    private userAddressRepository: UserAddressRepository, // private connection: Connection,
   ) {}
 
   async prepareUserAddressesToSave(
@@ -22,7 +24,7 @@ export class UsersService {
     const addresses: UserAddress[] = [];
     for (const add of address) {
       const addressToSave = new UserAddress();
-
+      addressToSave.id = uuidv4();
       addressToSave.country = add.country;
       addressToSave.city = add.city;
       addressToSave.street = add.street;
@@ -53,8 +55,13 @@ export class UsersService {
   }
 
   async addUser(newUser: CreateUserDto): Promise<User> {
+    // return this.connection.transaction(async (manager: EntityManager) => {
     const userToSave = new User();
+
     userToSave.address = await this.prepareUserAddressesToSave(newUser.address);
+    // manager.getCustomRepository(UserAddressRepository),
+    // );
+
     userToSave.id = uuidv4();
     userToSave.firstName = newUser.firstName;
     userToSave.lastName = newUser.lastName;
@@ -63,6 +70,7 @@ export class UsersService {
     userToSave.position = newUser.position;
     this.userRepository.save(userToSave);
     return userToSave;
+    // await manager.getCustomRepository(UserRepository).save(userToSave);
   }
 
   async deleteUser(id: string): Promise<void> {
@@ -90,7 +98,7 @@ export class UsersService {
       where: {
         id: id,
       },
-    }); //czy takie findOne czy nie findOne(id) czy jak nizej
+    });
     // return await this.userRepository.getUserById(id);
   }
 

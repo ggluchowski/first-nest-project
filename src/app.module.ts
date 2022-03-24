@@ -13,7 +13,7 @@ import { AppService } from './app.service';
 import { ProductsModule } from './products/products.module';
 import { UsersModule } from './users/users.module';
 
-import config = require('./ormconfig');
+import config from './ormconfig';
 
 import * as cors from 'cors';
 

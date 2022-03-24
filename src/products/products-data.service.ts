@@ -42,6 +42,7 @@ export class ProductsDataService {
     productToUpdate.price = dto.price;
     productToUpdate.count = dto.count;
     productToUpdate.tags = tags;
+    productToUpdate.updatedAt = new Date();
 
     await this.productRepository.save(productToUpdate);
 
