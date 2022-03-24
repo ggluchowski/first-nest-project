@@ -8,14 +8,15 @@ import { UserAddressRepository } from './db/userAddress.repository';
 import { UserAddress } from './db/userAddress.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { UserRequireUniqueEmailException } from './exception/user-require-unique-email-exception';
-// import Connection from 'mysql2/typings/mysql/lib/Connection';
-// import { EntityManager } from 'typeorm';
+import Connection from 'mysql2/typings/mysql/lib/Connection';
+import { EntityManager } from 'typeorm';
 
 @Injectable()
 export class UsersService {
   constructor(
     private userRepository: UserRepository,
-    private userAddressRepository: UserAddressRepository, // private connection: Connection,
+    private userAddressRepository: UserAddressRepository,
+    private connection: Connection,
   ) {}
 
   async prepareUserAddressesToSave(
@@ -55,22 +56,20 @@ export class UsersService {
   }
 
   async addUser(newUser: CreateUserDto): Promise<User> {
-    // return this.connection.transaction(async (manager: EntityManager) => {
-    const userToSave = new User();
+    return this.connection.beginTransaction(async (manager: EntityManager) => {
+      const userToSave = new User();
 
-    userToSave.address = await this.prepareUserAddressesToSave(newUser.address);
-    // manager.getCustomRepository(UserAddressRepository),
-    // );
+      userToSave.address = await this.prepareUserAddressesToSave(newUser.address, manager.getCustomRepository(UserAddressRepository));
 
-    userToSave.id = uuidv4();
-    userToSave.firstName = newUser.firstName;
-    userToSave.lastName = newUser.lastName;
-    userToSave.email = newUser.email;
-    userToSave.dateOfBirth = newUser.dateOfBirth;
-    userToSave.position = newUser.position;
-    this.userRepository.save(userToSave);
-    return userToSave;
-    // await manager.getCustomRepository(UserRepository).save(userToSave);
+      userToSave.id = uuidv4();
+      userToSave.firstName = newUser.firstName;
+      userToSave.lastName = newUser.lastName;
+      userToSave.email = newUser.email;
+      userToSave.dateOfBirth = newUser.dateOfBirth;
+      userToSave.position = newUser.position;
+      this.userRepository.save(userToSave);
+      return await manager.getCustomRepository(UserRepository).save(userToSave);
+    });
   }
 
   async deleteUser(id: string): Promise<void> {

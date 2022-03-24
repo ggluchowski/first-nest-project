@@ -33,6 +33,12 @@ export class Product {
   @CreateDateColumn({ type: 'timestamp' })
   updatedAt: Date;
 
+  @Column({
+    type: 'text',
+    nullable: true,
+  })
+  description: string;
+
   @ManyToMany((type) => Tag)
   @JoinTable({
     name: 'products_tags',
