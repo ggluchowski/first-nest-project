@@ -2,32 +2,40 @@ import { Injectable } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './db/product.entity';
-import { v4 as uuidv4 } from 'uuid';
+// import { v4 as uuidv4 } from 'uuid';
 import { ProductRepository } from './db/product.repository';
 import { TagRepository } from './db/tag.repository';
 import { Tag } from './db/tag.entity';
+import { Connection } from 'typeorm';
+import { EntityManager } from 'typeorm';
 
 @Injectable()
 export class ProductsDataService {
   constructor(
     private productRepository: ProductRepository,
     private tagRepository: TagRepository,
+    private connection: Connection,
   ) {}
 
   async addProduct(newProduct: CreateProductDto): Promise<Product> {
-    const tags: Tag[] = await this.tagRepository.findTagsByName(
-      newProduct.tags,
-    );
-    const productToSave = new Product();
-    productToSave.id = uuidv4();
-    productToSave.name = newProduct.name;
-    productToSave.price = newProduct.price;
-    productToSave.count = newProduct.count;
-    productToSave.tags = tags;
-    productToSave.createdAt = new Date();
-    productToSave.updatedAt = new Date();
-    this.productRepository.save(productToSave);
-    return productToSave;
+    return this.connection.transaction(async (manager: EntityManager) => {
+      const tags: Tag[] = await manager
+        .getCustomRepository(TagRepository)
+        .findTagsByName(newProduct.tags);
+
+      const productToSave = new Product();
+      //productToSave.id = uuidv4();
+      productToSave.name = newProduct.name;
+      productToSave.price = newProduct.price;
+      productToSave.count = newProduct.count;
+      productToSave.tags = tags;
+      productToSave.createdAt = new Date();
+      productToSave.updatedAt = new Date();
+
+      return await manager
+        .getCustomRepository(ProductRepository)
+        .save(productToSave);
+    });
   }
 
   async deleteProduct(id: string): Promise<void> {
@@ -35,18 +43,23 @@ export class ProductsDataService {
   }
 
   async updateProduct(id: string, dto: UpdateProductDto): Promise<Product> {
-    const tags: Tag[] = await this.tagRepository.findTagsByName(dto.tags);
-    const productToUpdate = await this.getProductById(id);
+    return this.connection.transaction(async (manager: EntityManager) => {
+      const tags: Tag[] = await manager
+        .getCustomRepository(TagRepository)
+        .findTagsByName(dto.tags);
 
-    productToUpdate.name = dto.name;
-    productToUpdate.price = dto.price;
-    productToUpdate.count = dto.count;
-    productToUpdate.tags = tags;
-    productToUpdate.updatedAt = new Date();
+      const productToUpdate = await this.getProductById(id);
 
-    await this.productRepository.save(productToUpdate);
+      productToUpdate.name = dto.name;
+      productToUpdate.price = dto.price;
+      productToUpdate.count = dto.count;
+      productToUpdate.tags = tags;
+      productToUpdate.updatedAt = new Date();
 
-    return this.getProductById(id);
+      return await manager
+        .getCustomRepository(ProductRepository)
+        .save(productToUpdate);
+    });
   }
 
   async getProductById(id: string): Promise<Product> {

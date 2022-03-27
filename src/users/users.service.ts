@@ -8,7 +8,7 @@ import { UserAddressRepository } from './db/userAddress.repository';
 import { UserAddress } from './db/userAddress.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { UserRequireUniqueEmailException } from './exception/user-require-unique-email-exception';
-import Connection from 'mysql2/typings/mysql/lib/Connection';
+import { Connection } from 'typeorm';
 import { EntityManager } from 'typeorm';
 
 @Injectable()
@@ -21,6 +21,7 @@ export class UsersService {
 
   async prepareUserAddressesToSave(
     address: CreateUserAddressDto[] | UpdateUserAddressDto[],
+    _userAddressRepository: UserAddressRepository,
   ): Promise<UserAddress[]> {
     const addresses: UserAddress[] = [];
     for (const add of address) {
@@ -56,10 +57,13 @@ export class UsersService {
   }
 
   async addUser(newUser: CreateUserDto): Promise<User> {
-    return this.connection.beginTransaction(async (manager: EntityManager) => {
+    return this.connection.transaction(async (manager: EntityManager) => {
       const userToSave = new User();
 
-      userToSave.address = await this.prepareUserAddressesToSave(newUser.address, manager.getCustomRepository(UserAddressRepository));
+      userToSave.address = await this.prepareUserAddressesToSave(
+        newUser.address,
+        manager.getCustomRepository(UserAddressRepository),
+      );
 
       userToSave.id = uuidv4();
       userToSave.firstName = newUser.firstName;
@@ -67,7 +71,7 @@ export class UsersService {
       userToSave.email = newUser.email;
       userToSave.dateOfBirth = newUser.dateOfBirth;
       userToSave.position = newUser.position;
-      this.userRepository.save(userToSave);
+
       return await manager.getCustomRepository(UserRepository).save(userToSave);
     });
   }
@@ -78,18 +82,20 @@ export class UsersService {
   }
 
   async updateUser(id: string, dto: UpdateUserDto): Promise<User> {
-    await this.deleteUserAddressesByUserId(id);
+    return this.connection.transaction(async (manager: EntityManager) => {
+      await this.deleteUserAddressesByUserId(id);
 
-    const userToUpdate = await this.getUserById(id);
+      const userToUpdate = await this.getUserById(id);
 
-    userToUpdate.firstName = dto.firstName;
-    userToUpdate.lastName = dto.lastName;
-    userToUpdate.email = dto.email;
-    userToUpdate.position = Roles.SELLER;
+      userToUpdate.firstName = dto.firstName;
+      userToUpdate.lastName = dto.lastName;
+      userToUpdate.email = dto.email;
+      userToUpdate.position = Roles.SELLER;
 
-    await this.userRepository.save(userToUpdate);
-
-    return await this.getUserById(id);
+      return await manager
+        .getCustomRepository(UserRepository)
+        .save(userToUpdate);
+    });
   }
 
   async getUserById(id: string): Promise<User> {

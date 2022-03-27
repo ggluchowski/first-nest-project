@@ -8,13 +8,13 @@ export default {
   password: dbVariable.userDBPassword,
   database: 'shop',
   entities: [__dirname + '/**/*.entity{.ts, .js}'],
-  synchronize: false, // przy produkcji powinno byc na false
   autoLoadEntities: true, //zmienione
-  dropSchema: false,
-  migrationsRun: true,
+  synchronize: true, // przy produkcji powinno byc na false
+  dropSchema: true,
+  migrationsRun: false,
   migrations: [__dirname + '/db/migrations/**/*{.ts,.js}'],
   cli: {
     migrationsDir: 'src/db/migrations',
   },
-  subscribers: [__dirname + '/db/subscribers/**/*{.ts,.js}'],
+  subscribers: [__dirname + '/db/subscribers/*{.ts,.js}'],
 };
