@@ -14,11 +14,9 @@ export class OrdersDataService {
     private connection: Connection,
   ) {}
 
-  async addOrder(newOrder: CreateOrderDto): Promise<Order> {
-    return this.connection.transaction(async (manager: EntityManager) => {
-
-    })
-  }
+  // async addOrder(newOrder: CreateOrderDto): Promise<Order> {
+  //   return this.connection.transaction(async (manager: EntityManager) => {});
+  // }
 
   // async updateOrder(id: string, dto: UpdateOrderDto): Promise<Order> {
   //   return this.connection.transaction(async (manager: EntityManager) => {
