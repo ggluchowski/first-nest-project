@@ -31,9 +31,10 @@ export class InitData1648239715305 implements MigrationInterface {
         precision: 1,
       });
       addressArr.push(addressToSave);
+      await getRepository(UserAddress).save(addressToSave);
     }
 
-    await getRepository(UserAddress).insert(addressArr);
+    // await getRepository(UserAddress).insert(addressArr);
     console.log(dataAmount + ' addresses saved');
     return addressArr;
   }
@@ -46,10 +47,11 @@ export class InitData1648239715305 implements MigrationInterface {
       const tag = tags[i];
       const tagToSave = new Tag();
       tagToSave.name = tag;
-      tagsArr.push(tagToSave);
+      // tagsArr.push(tagToSave);
+      tagsArr.push(await getRepository(Tag).save(tagToSave));
     }
 
-    await getRepository(Tag).insert(tagsArr);
+    // await getRepository(Tag).insert(tagsArr);
     console.log('Tags saved');
 
     return tagsArr;
@@ -87,10 +89,12 @@ export class InitData1648239715305 implements MigrationInterface {
       productToSave.updatedAt = new Date();
       productToSave.description = faker.commerce.productDescription();
       productToSave.tags = productTags;
+      // productsArr.push(productToSave);
       productsArr.push(productToSave);
+      await getRepository('Product').save(productToSave);
     }
 
-    await getRepository(Product).insert(productsArr);
+    // await getRepository(Product).insert(productsArr);
     console.log(dataAmount + ' products saved');
     return productsArr;
   }
@@ -125,18 +129,20 @@ export class InitData1648239715305 implements MigrationInterface {
       userToSave.position = roles;
       userToSave.address = userAddress;
       usersArr.push(userToSave);
+      await getRepository(User).save(userToSave);
+      await getRepository(UserAddress).save(userAddress);
     }
 
-    await getRepository(User).insert(usersArr);
+    // await getRepository(User).insert(usersArr);
     console.log(dataAmount + ' users saved');
     return usersArr;
   }
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    const tags = this.saveTags();
-    this.saveProducts(await tags);
-    const address = this.saveAddress();
-    this.saveUsers(await address);
+    const tags = await this.saveTags();
+    await this.saveProducts(tags);
+    const address = await this.saveAddress();
+    await this.saveUsers(address);
     console.log('Fake data end');
   }
 

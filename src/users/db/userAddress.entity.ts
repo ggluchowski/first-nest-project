@@ -1,4 +1,10 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { User } from './users.entity';
 
 @Entity({
@@ -23,6 +29,10 @@ export class UserAddress {
   @Column({ type: 'int' })
   flatNumber?: number;
 
-  @ManyToOne((type) => User, (user) => user.id, { onDelete: 'CASCADE' })
+  @ManyToOne((type) => User, (user) => user.id, {
+    onDelete: 'CASCADE',
+    cascade: true,
+  })
+  @JoinColumn({ name: 'user' })
   user: User;
 }

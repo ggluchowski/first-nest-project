@@ -26,7 +26,7 @@ export class Product {
   })
   price: number;
 
-  @Column({ default: 1 })
+  @Column({ type: 'int', default: 1 })
   count: number;
 
   @CreateDateColumn({ type: 'timestamp' })
@@ -39,7 +39,13 @@ export class Product {
     type: 'text',
     nullable: true,
   })
-  description: string;
+  description?: string;
+
+  // @Column({
+  //   type: 'text',
+  //   nullable: true,
+  // })
+  // info?: string;
 
   @ManyToMany((type) => Tag)
   @JoinTable({
@@ -51,11 +57,5 @@ export class Product {
       name: 'tagId',
     },
   })
-  tags: Tag[];
-
-  @OneToMany(
-    (type) => OrderedProducts,
-    (orderedProducts) => orderedProducts.product,
-  )
-  orderedProducts: OrderedProducts[];
+  tags: Array<Tag>;
 }
