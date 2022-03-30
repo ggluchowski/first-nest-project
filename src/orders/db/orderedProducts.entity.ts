@@ -5,6 +5,8 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   OneToOne,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 import { Order } from './order.entity';
 
@@ -27,9 +29,11 @@ export class OrderedProducts {
   @Column({ type: 'int' })
   count: number;
 
-  @OneToOne((type) => Order, (order) => order.id)
+  @ManyToOne(() => Order, (order) => order.id)
+  @JoinColumn()
   order: Order;
 
-  @OneToOne((type) => Product, (product) => product.id)
+  @OneToOne(() => Product, (product) => product.id)
+  @JoinColumn()
   product: Product;
 }
