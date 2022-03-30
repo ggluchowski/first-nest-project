@@ -1,5 +1,3 @@
-import { Tag } from '../db/tag.entity';
-
 export interface ExternalProductDto {
   id: string;
   name: string;

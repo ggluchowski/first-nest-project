@@ -1,3 +1,4 @@
+import { Order } from 'src/orders/db/order.entity';
 import { Roles } from 'src/shared/enums/roles.enum';
 import {
   Column,
@@ -34,4 +35,7 @@ export class User {
 
   @OneToMany((type) => UserAddress, (adress) => adress.user)
   address?: Array<UserAddress>;
+
+  @OneToMany((type) => Order, (order) => order.user)
+  order: Order[];
 }

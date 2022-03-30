@@ -1,5 +1,4 @@
 import { IsArray, IsNumber, MaxLength, Min, MinLength } from 'class-validator';
-import { Tag } from '../db/tag.entity';
 
 export class CreateProductDto {
   @MinLength(0)

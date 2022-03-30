@@ -1,9 +1,11 @@
+import { OrderedProducts } from 'src/orders/db/orderedProducts.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
   JoinTable,
   ManyToMany,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Tag } from './tag.entity';
