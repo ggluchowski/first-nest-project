@@ -1,15 +1,17 @@
-import { UserAddress } from 'src/users/db/userAddress.entity';
-import { User } from 'src/users/db/users.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { OrderStatus } from '../enums/orderStatus.enum';
 import { OrderedProducts } from './orderedProducts.entity';
+import { UserAddress } from 'src/users/db/userAddress.entity';
+import { User } from 'src/users/db/users.entity';
 
 @Entity({
   name: 'orders',
@@ -35,15 +37,14 @@ export class Order {
   @Column({ default: 0, type: 'float' })
   price: number;
 
-  @OneToMany(
-    (type) => OrderedProducts,
-    (orderdProducts) => orderdProducts.order,
-  )
-  orderedProducts: OrderedProducts[];
+  @OneToMany(() => OrderedProducts, (orderdProducts) => orderdProducts.order)
+  orderedProducts: Array<OrderedProducts>;
 
-  @OneToOne((type) => User, (user) => user.order)
+  @ManyToOne(() => User, (user) => user.order)
+  @JoinColumn()
   user: User;
 
-  @OneToOne((type) => UserAddress, (address) => address.id)
+  @OneToOne(() => UserAddress, (address) => address.id)
+  @JoinColumn()
   address: UserAddress;
 }

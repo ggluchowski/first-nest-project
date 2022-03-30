@@ -1,8 +1,10 @@
+import { Order } from 'src/orders/db/order.entity';
 import {
   Column,
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from './users.entity';
@@ -29,10 +31,13 @@ export class UserAddress {
   @Column({ type: 'int' })
   flatNumber?: number;
 
-  @ManyToOne((type) => User, (user) => user.id, {
+  @ManyToOne(() => User, (user) => user.id, {
     onDelete: 'CASCADE',
     cascade: true,
   })
   @JoinColumn({ name: 'user' })
   user: User;
+
+  @OneToOne(() => Order, (order) => order.address)
+  order: Order;
 }

@@ -5,7 +5,7 @@ import {
   Entity,
   JoinTable,
   ManyToMany,
-  OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Tag } from './tag.entity';
@@ -58,4 +58,7 @@ export class Product {
     },
   })
   tags: Array<Tag>;
+
+  @OneToOne(() => OrderedProducts, (orderedProducts) => orderedProducts.product)
+  orderedProducts: OrderedProducts;
 }

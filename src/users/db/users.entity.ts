@@ -33,9 +33,9 @@ export class User {
   })
   position: Roles;
 
-  @OneToMany((type) => UserAddress, (adress) => adress.user)
+  @OneToMany(() => UserAddress, (adress) => adress.user)
   address?: Array<UserAddress>;
 
-  @OneToMany((type) => Order, (order) => order.user)
-  order: Order[];
+  @OneToMany(() => Order, (order) => order.user)
+  order: Array<Order>;
 }
