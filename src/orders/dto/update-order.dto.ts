@@ -18,6 +18,10 @@ export class UpdateOrderDto {
   @IsUUID()
   addresId: string;
 
+  @IsNotEmpty()
+  @IsUUID()
+  userId: string;
+
   extraInfo?: string;
 
   @ValidateNested({ each: true })

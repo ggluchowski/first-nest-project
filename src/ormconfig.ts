@@ -10,7 +10,7 @@ export default {
   entities: [__dirname + '/**/*.entity{.ts, .js}'],
   autoLoadEntities: true, //zmienione
   synchronize: true, // przy produkcji powinno byc na false
-  dropSchema: false,
+  dropSchema: true,
   migrationsRun: false,
   migrations: [__dirname + '/db/migrations/**/*{.ts,.js}'],
   cli: {

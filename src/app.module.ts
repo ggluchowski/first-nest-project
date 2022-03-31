@@ -17,6 +17,9 @@ import { OrdersModule } from './orders/orders.module';
 import config from './ormconfig';
 
 import * as cors from 'cors';
+import { ProductRepository } from './products/db/product.repository';
+import { TagRepository } from './products/db/tag.repository';
+import { ProductsDataService } from './products/products-data.service';
 
 @Module({
   imports: [
@@ -25,9 +28,11 @@ import * as cors from 'cors';
     UsersModule,
     OrdersModule,
     TypeOrmModule.forRoot(config as ConnectionOptions),
+    // TypeOrmModule.forFeature([ProductRepository]),
+    // TypeOrmModule.forFeature([TagRepository]),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService], //, ProductsDataService
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {

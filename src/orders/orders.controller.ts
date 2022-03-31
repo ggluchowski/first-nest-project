@@ -16,60 +16,56 @@ import { ExternalOrderDto } from './dto/external-order.dto';
 import { OrdersDataService } from './orders-data.service';
 import { RoleGuard } from 'src/shared/guards/role.guard';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { isNotEmpty } from 'class-validator';
+import { count } from 'console';
+import { ProductRepository } from 'src/products/db/product.repository';
 
 @Controller('orders')
 export class OrdersController {
   constructor(private orderRepository: OrdersDataService) {}
 
   mapOrderToExternal(order: Order): ExternalOrderDto {
-    return {
-      id: order.id,
-      createAt: dateToArray(order.createdAt),
-      price: order.price,
-      orderStatus: order.orderStatus,
-      orderedProducts: [
-        {
-          productListId: order.orderedProducts.id,
-          productId: order.orderedProducts.product.id,
-          name: order.orderedProducts.product.name,
-          price: order.orderedProducts.price,
-          count: order.orderedProducts.count,
-        },
-        // order.orderedProducts.id,
-        // order.id,
-        // order.orderedProducts.product.name,
-        // order.orderedProducts.price,
-        // order.orderedProducts.count,
-      ],
-      user: {
-        firstName: order.user.firstName,
-        lastName: order.user.lastName,
-        email: order.user.email,
-        address: {
-          id: order.address.id,
-          country: order.address.country,
-          city: order.address.city,
-          street: order.address.street,
-          buildingNumber: order.address.buildingNumber,
-          flatNumber: order.address.flatNumber,
-        },
+    const result = new ExternalOrderDto();
+    const orderedProductTab = order.orderedProducts;
+
+    result.id = order.id;
+    result.createAt = dateToArray(order.createdAt);
+    result.price = order.price;
+    result.orderStatus = order.orderStatus;
+    result.user = {
+      firstName: order.user.firstName,
+      lastName: order.user.lastName,
+      email: order.user.email,
+      address: {
+        id: order.address.id,
+        country: order.address.country,
+        city: order.address.city,
+        street: order.address.street,
+        buildingNumber: order.address.buildingNumber,
+        flatNumber: order.address.flatNumber,
       },
     };
+
+    for (let i; i < orderedProductTab.length; i++) {
+      result.orderedProducts[i] = {
+        productListId: orderedProductTab[i].id,
+        productId: orderedProductTab[i].product.id,
+        name: orderedProductTab[i].product.name,
+        price: orderedProductTab[i].price,
+        count: orderedProductTab[i].count,
+      };
+    }
+
+    return result;
   }
 
-  // productListId:
-  // productId:
-  // name:
-  // price:
-  // count:
-
-  // @UseGuards(RoleGuard)
-  // @Post()
-  // async addProduct(@Body() _order_: CreateOrderDto): Promise < ExternalOrderDto > {
-  //   return this.mapOrderToExternal(
-  //     await this.orderRepository.addOrder(_order_),
-  //   );
-  // }
+  @UseGuards(RoleGuard)
+  @Post()
+  async addOrder(@Body() _order_: CreateOrderDto): Promise<ExternalOrderDto> {
+    return this.mapOrderToExternal(
+      await this.orderRepository.addOrder(_order_),
+    );
+  }
 
   // @Get(':id')
   // async getOrderById(

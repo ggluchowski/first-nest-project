@@ -13,7 +13,7 @@ export class InitData1648239715305 implements MigrationInterface {
 
   private async saveAddress(): Promise<UserAddress[]> {
     const addressArr: UserAddress[] = [];
-    const dataAmount = 150;
+    const dataAmount = 15;
 
     for (let i = 0; i < dataAmount; i++) {
       const addressToSave = new UserAddress();
@@ -59,7 +59,7 @@ export class InitData1648239715305 implements MigrationInterface {
 
   private async saveProducts(tags: Tag[]): Promise<Product[]> {
     const productsArr: Product[] = [];
-    const dataAmount = 100;
+    const dataAmount = 10;
 
     for (let i = 0; i < dataAmount; i++) {
       const productToSave = new Product();
@@ -101,7 +101,7 @@ export class InitData1648239715305 implements MigrationInterface {
 
   private async saveUsers(address: UserAddress[]): Promise<User[]> {
     const usersArr: User[] = [];
-    const dataAmount = 100;
+    const dataAmount = 10;
     const userAddress: UserAddress[] = [];
     const random = this.randomNumber(0, address.length);
     const addressRandom = faker.random.arrayElements(address, random);

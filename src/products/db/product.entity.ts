@@ -47,7 +47,7 @@ export class Product {
   // })
   // info?: string;
 
-  @ManyToMany((type) => Tag)
+  @ManyToMany(() => Tag)
   @JoinTable({
     name: 'products_tags',
     joinColumn: {

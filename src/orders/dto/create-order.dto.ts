@@ -8,13 +8,17 @@ import {
 } from 'class-validator';
 
 export class CreateOrderDto {
-  @IsNotEmpty()
-  @IsUUID()
-  id: string;
+  // @IsNotEmpty()
+  // @IsUUID()
+  // id: string;
 
   @IsNotEmpty()
   @IsUUID()
   addresId: string;
+
+  @IsNotEmpty()
+  @IsUUID()
+  userId: string;
 
   extraInfo?: string;
 

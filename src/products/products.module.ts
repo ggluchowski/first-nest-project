@@ -12,5 +12,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
   ],
   controllers: [ProductsController],
   providers: [ProductsDataService],
+  exports: [ProductsDataService],
 })
 export class ProductsModule {}
