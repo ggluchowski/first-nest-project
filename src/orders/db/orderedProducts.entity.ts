@@ -29,11 +29,15 @@ export class OrderedProducts {
   @Column({ type: 'int' })
   count: number;
 
-  @ManyToOne(() => Order, (order) => order.id)
+  @ManyToOne(() => Order, (order) => order.id, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn()
   order: Order;
 
-  @OneToOne(() => Product, (product) => product.id)
+  @OneToOne(() => Product, (product) => product.orderedProducts, {
+    eager: true,
+  })
   @JoinColumn()
   product: Product;
 }

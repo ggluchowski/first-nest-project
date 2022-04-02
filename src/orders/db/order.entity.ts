@@ -37,14 +37,20 @@ export class Order {
   @Column({ default: 0, type: 'float' })
   price: number;
 
-  @OneToMany(() => OrderedProducts, (orderdProducts) => orderdProducts.order)
+  @OneToMany(() => OrderedProducts, (orderdProducts) => orderdProducts.order, {
+    eager: true,
+  })
   orderedProducts: Array<OrderedProducts>;
 
-  @ManyToOne(() => User, (user) => user.order)
+  @ManyToOne(() => User, (user) => user.order, {
+    eager: true,
+  })
   @JoinColumn()
   user: User;
 
-  @OneToOne(() => UserAddress, (address) => address.id)
+  @OneToOne(() => UserAddress, (address) => address.id, {
+    eager: true,
+  })
   @JoinColumn()
   address: UserAddress;
 }

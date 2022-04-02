@@ -12,6 +12,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
   ],
   controllers: [ProductsController],
   providers: [ProductsDataService],
-  exports: [ProductsDataService],
+  exports: [ProductsDataService, TypeOrmModule],
+  // https://stackoverflow.com/questions/65934094/how-to-create-service-with-repository-exports
 })
 export class ProductsModule {}

@@ -10,9 +10,9 @@ import {
 import { OrderStatus } from '../enums/orderStatus.enum';
 
 export class UpdateOrderDto {
-  @IsNotEmpty()
-  @IsUUID()
-  id: string;
+  // @IsNotEmpty()
+  // @IsUUID()
+  // id: string;
 
   @IsNotEmpty()
   @IsUUID()

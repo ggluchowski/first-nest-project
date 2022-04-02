@@ -16,9 +16,6 @@ import { ExternalOrderDto } from './dto/external-order.dto';
 import { OrdersDataService } from './orders-data.service';
 import { RoleGuard } from 'src/shared/guards/role.guard';
 import { UpdateOrderDto } from './dto/update-order.dto';
-import { isNotEmpty } from 'class-validator';
-import { count } from 'console';
-import { ProductRepository } from 'src/products/db/product.repository';
 
 @Controller('orders')
 export class OrdersController {
@@ -46,7 +43,9 @@ export class OrdersController {
       },
     };
 
-    for (let i; i < orderedProductTab.length; i++) {
+    result.orderedProducts = [];
+
+    for (let i = 0; i < orderedProductTab.length; i++) {
       result.orderedProducts[i] = {
         productListId: orderedProductTab[i].id,
         productId: orderedProductTab[i].product.id,
@@ -67,39 +66,39 @@ export class OrdersController {
     );
   }
 
-  // @Get(':id')
-  // async getOrderById(
-  //     @Param('id', new ParseUUIDPipe({ version: '4' })) _id_: string,
-  //   ): Promise < ExternalOrderDto > {
-  //   return this.mapOrderToExternal(
-  //     await this.orderRepository.getOrderById(_id_),
-  //   );
-  // }
+  @Get(':id')
+  async getOrderById(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) _id_: string,
+  ): Promise<ExternalOrderDto> {
+    return this.mapOrderToExternal(
+      await this.orderRepository.getOrderById(_id_),
+    );
+  }
 
-  // @Get()
-  // async getAllOrders(): Promise < ExternalOrderDto[] > {
-  //   const allOrders = await this.orderRepository.getAllOrders();
-  //   const externalOrders = allOrders.map((i) => this.mapOrderToExternal(i));
-  //   return externalOrders;
-  // }
+  @Get()
+  async getAllOrders(): Promise<ExternalOrderDto[]> {
+    const allOrders = await this.orderRepository.getAllOrders();
+    const externalOrders = allOrders.map((i) => this.mapOrderToExternal(i));
+    return externalOrders;
+  }
 
-  // @Delete(':id')
-  // async deleteOrder(
-  //     @Param('id', new ParseUUIDPipe({ version: '4' })) _id_: string,
-  //   ): Promise < void> {
-  //   return await this.orderRepository.deleteOrder(_id_);
-  // }
+  @Delete(':id')
+  async deleteOrder(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) _id_: string,
+  ): Promise<void> {
+    return await this.orderRepository.deleteOrder(_id_);
+  }
 
-  // @Put(':id')
-  // async updateOrder(
-  //     @Param('id', new ParseUUIDPipe({ version: '4' })) _id_: string,
-  //     @Body() _updateOrder_: UpdateOrderDto,
-  //   ): Promise < ExternalOrderDto > {
-  //   const orderToUpdate = await this.orderRepository.updateOrder(
-  //     _id_,
-  //     _updateOrder_,
-  //   );
+  @Put(':id')
+  async updateOrder(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) _id_: string,
+    @Body() _updateOrder_: UpdateOrderDto,
+  ): Promise<ExternalOrderDto> {
+    const orderToUpdate = await this.orderRepository.updateOrder(
+      _id_,
+      _updateOrder_,
+    );
 
-  //   return this.mapOrderToExternal(orderToUpdate);
-  // }
+    return this.mapOrderToExternal(orderToUpdate);
+  }
 }

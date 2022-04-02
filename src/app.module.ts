@@ -17,9 +17,6 @@ import { OrdersModule } from './orders/orders.module';
 import config from './ormconfig';
 
 import * as cors from 'cors';
-import { ProductRepository } from './products/db/product.repository';
-import { TagRepository } from './products/db/tag.repository';
-import { ProductsDataService } from './products/products-data.service';
 
 @Module({
   imports: [

@@ -9,8 +9,8 @@ export default {
   database: 'shop',
   entities: [__dirname + '/**/*.entity{.ts, .js}'],
   autoLoadEntities: true, //zmienione
-  synchronize: true, // przy produkcji powinno byc na false
-  dropSchema: true,
+  synchronize: false, // przy produkcji powinno byc na false
+  dropSchema: false,
   migrationsRun: false,
   migrations: [__dirname + '/db/migrations/**/*{.ts,.js}'],
   cli: {

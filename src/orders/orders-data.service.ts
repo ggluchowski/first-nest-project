@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { Product } from 'src/products/db/product.entity';
 import { ProductRepository } from 'src/products/db/product.repository';
 import { UserAddress } from 'src/users/db/userAddress.entity';
 import { User } from 'src/users/db/users.entity';
-import { Connection, EntityManager, getRepository } from 'typeorm';
+import { Connection, EntityManager } from 'typeorm';
 import { Order } from './db/order.entity';
 import { OrderRepository } from './db/order.repository';
 import { OrderedProducts } from './db/orderedProducts.entity';
@@ -21,7 +20,7 @@ import { OrderStatus } from './enums/orderStatus.enum';
 @Injectable()
 export class OrdersDataService {
   constructor(
-    // private productRepository: ProductRepository,
+    private productRepository: ProductRepository,
     private orderRepository: OrderRepository,
     private orderedProductRepository: OrderedProductsRepository,
     private connection: Connection,
@@ -31,7 +30,6 @@ export class OrdersDataService {
     productsTab:
       | Array<CreateOrderedProductDto>
       | Array<UpdateOrderedProductDto>,
-    productRepository,
   ): Promise<OrderedProducts[]> {
     const orderedProductsArr: OrderedProducts[] = [];
     const idsArr = [];
@@ -41,10 +39,9 @@ export class OrdersDataService {
       idsArr.push(item.productId);
       countArr.push(item.count);
     }
+    const findProducts = await this.productRepository.findByIds(idsArr);
 
-    const findProducts = await productRepository.findByIds(idsArr);
-
-    for (let i; i < findProducts.length; i++) {
+    for (let i = 0; i < findProducts.length; i++) {
       const productToSave = new OrderedProducts();
       productToSave.createdAt = new Date();
       productToSave.updatedAt = new Date();
@@ -70,10 +67,8 @@ export class OrdersDataService {
   async addOrder(newOrder: CreateOrderDto): Promise<Order> {
     return this.connection.transaction(async (manager: EntityManager) => {
       const orderToSave = new Order();
-      const productRepository = await getRepository(Product).find();
       const orderedProducts = await this.saveOrderedProducts(
         newOrder.orderedProducts,
-        productRepository,
       );
 
       orderToSave.createdAt = new Date();
@@ -92,11 +87,28 @@ export class OrdersDataService {
     });
   }
 
-  // async updateOrder(id: string, dto: UpdateOrderDto): Promise<Order> {
-  //   return this.connection.transaction(async (manager: EntityManager) => {
+  async updateOrder(id: string, updateOrder: UpdateOrderDto): Promise<Order> {
+    return this.connection.transaction(async (manager: EntityManager) => {
+      await this.orderedProductRepository.deleteProductOrderByOrderId(id);
+      const updateToSave = await this.getOrderById(id);
+      const orderedProducts = await this.saveOrderedProducts(
+        updateOrder.orderedProducts,
+      );
 
-  //   })
-  // }
+      updateToSave.updatedAt = new Date();
+      updateToSave.orderStatus = updateOrder.orderStatus;
+      updateToSave.price = this.sumPrices(orderedProducts);
+      updateToSave.orderedProducts = orderedProducts;
+      updateToSave.user = new User();
+      updateToSave.user.id = updateOrder.userId;
+      updateToSave.address = new UserAddress();
+      updateToSave.address.id = updateOrder.addresId;
+
+      return await manager
+        .getCustomRepository(OrderRepository)
+        .save(updateToSave);
+    });
+  }
 
   async deleteOrder(id: string): Promise<void> {
     await this.orderRepository.delete(id);
